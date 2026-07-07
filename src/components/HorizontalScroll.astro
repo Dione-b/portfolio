@@ -1,0 +1,178 @@
+---
+const { labels = [] } = Astro.props;
+const totalSections = labels.length;
+---
+
+<div class="scroll-container fixed inset-0 overflow-hidden" id="scroll-container">
+  <div class="flex h-full transition-transform duration-[700ms] ease-[cubic-bezier(0.16,1,0.3,1)]" id="scroll-track">
+    <slot />
+  </div>
+
+  <div class="fixed top-0 left-0 right-0 h-0.5 z-50 bg-border/30">
+    <div class="h-full bg-accent transition-all duration-500 ease-out" id="progress-bar" style="width: 5%" />
+  </div>
+
+  <nav class="fixed right-5 top-1/2 -translate-y-1/2 flex flex-col gap-2.5 z-50" id="scroll-nav" role="navigation" aria-label="Section navigation">
+    {labels.map((label, i) => (
+      <button class="scroll-dot group relative flex items-center justify-center" data-index={i} aria-label={label} title={label}>
+        <span class="w-2 h-2 rounded-full bg-ink-muted/30 group-hover:bg-accent/60 transition-all" />
+        <span class="absolute right-4 top-1/2 -translate-y-1/2 text-xs font-mono text-ink-muted/0 group-hover:text-ink-muted/60 transition-colors whitespace-nowrap pointer-events-none">{label}</span>
+      </button>
+    ))}
+  </nav>
+
+  <div class="fixed bottom-8 left-1/2 -translate-x-1/2 z-50 flex items-center gap-4 font-mono">
+    <button id="prev-btn" class="text-ink-muted/30 hover:text-accent transition-colors text-sm">←</button>
+    <span class="text-xs text-ink-muted/40" id="scroll-counter">1 / {totalSections}</span>
+    <button id="next-btn" class="text-ink-muted/30 hover:text-accent transition-colors text-sm">→</button>
+  </div>
+</div>
+
+<script define:vars={{ totalSections, labels }}>
+const track = document.getElementById("scroll-track");
+const dots = document.querySelectorAll(".scroll-dot");
+const counter = document.getElementById("scroll-counter");
+const progressBar = document.getElementById("progress-bar");
+const prevBtn = document.getElementById("prev-btn");
+const nextBtn = document.getElementById("next-btn");
+
+let currentIndex = 0;
+let isAnimating = false;
+let lastWheelTime = 0;
+
+const prefersReduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+if (prefersReduced) {
+  track.style.flexDirection = "column";
+  track.style.transform = "none";
+  track.style.transition = "none";
+  for (const child of track.children) {
+    child.style.width = "100vw";
+    child.style.height = "auto";
+    child.style.minHeight = "100vh";
+    child.style.flexShrink = "0";
+  }
+} else {
+  function goToSection(index) {
+    if (isAnimating) return;
+    const clamped = Math.max(0, Math.min(totalSections - 1, index));
+    if (clamped === currentIndex) return;
+    currentIndex = clamped;
+    track.style.transform = `translateX(-${currentIndex * 100}vw)`;
+    updateUI(currentIndex);
+    isAnimating = true;
+    setTimeout(() => { isAnimating = false; }, 750);
+  }
+
+  function updateUI(index) {
+    dots.forEach((dot, i) => {
+      const span = dot.querySelector("span:first-child");
+      if (span) {
+        span.dataset.active = i === index ? "true" : undefined;
+        span.classList.toggle("bg-accent", i === index);
+        span.classList.toggle("scale-125", i === index);
+        span.classList.toggle("bg-ink-muted/30", i !== index);
+      }
+    });
+    if (counter) counter.textContent = `${index + 1} / ${totalSections}`;
+    if (progressBar) {
+      progressBar.style.width = totalSections > 1 ? `${(index / (totalSections - 1)) * 100}%` : "0%";
+    }
+    document.documentElement.style.setProperty("--section-index", String(index));
+    document.documentElement.style.setProperty("--scroll-progress", String(totalSections > 1 ? index / (totalSections - 1) : 0));
+  }
+
+  dots.forEach((dot) => {
+    dot.addEventListener("click", () => {
+      const idx = parseInt(dot.dataset.index);
+      if (!isNaN(idx)) goToSection(idx);
+    });
+  });
+
+  prevBtn?.addEventListener("click", () => goToSection(currentIndex - 1));
+  nextBtn?.addEventListener("click", () => goToSection(currentIndex + 1));
+
+  document.addEventListener("keydown", (e) => {
+    if (e.key === "ArrowDown") {
+      const sec = track.children[currentIndex];
+      const isScrollable = sec.hasAttribute("data-scrollable");
+      const hasOverflow = isScrollable && sec.scrollHeight > sec.clientHeight + 2;
+      if (hasOverflow && sec.scrollTop + sec.clientHeight < sec.scrollHeight - 2) {
+        sec.scrollTop += 60;
+        return;
+      }
+      e.preventDefault();
+      goToSection(currentIndex + 1);
+    }
+    if (e.key === "ArrowUp") {
+      const sec = track.children[currentIndex];
+      const isScrollable = sec.hasAttribute("data-scrollable");
+      const hasOverflow = isScrollable && sec.scrollHeight > sec.clientHeight + 2;
+      if (hasOverflow && sec.scrollTop > 0) {
+        sec.scrollTop -= 60;
+        return;
+      }
+      e.preventDefault();
+      goToSection(currentIndex - 1);
+    }
+    if (e.key === "ArrowRight") { e.preventDefault(); goToSection(currentIndex + 1); }
+    if (e.key === "ArrowLeft") { e.preventDefault(); goToSection(currentIndex - 1); }
+  });
+
+  const container = document.getElementById("scroll-container");
+  container.addEventListener("wheel", (e) => {
+    const now = Date.now();
+    const currentSection = track.children[currentIndex];
+    const isScrollable = currentSection.hasAttribute("data-scrollable");
+    const hasOverflow = isScrollable && currentSection.scrollHeight > currentSection.clientHeight + 2;
+
+    if (hasOverflow) {
+      const atTop = currentSection.scrollTop <= 0;
+      const atBottom = currentSection.scrollTop + currentSection.clientHeight >= currentSection.scrollHeight - 2;
+      const scrollingDown = e.deltaY > 0;
+      const scrollingUp = e.deltaY < 0;
+
+      if ((scrollingDown && !atBottom) || (scrollingUp && !atTop)) {
+        currentSection.scrollTop += e.deltaY;
+        return;
+      }
+    }
+
+    e.preventDefault();
+    if (now - lastWheelTime < 800) return;
+    lastWheelTime = now;
+    if (e.deltaY > 0) goToSection(currentIndex + 1);
+    else goToSection(currentIndex - 1);
+  }, { passive: false });
+
+  let touchStartY = 0;
+  let touchStartScrollTop = 0;
+  container.addEventListener("touchstart", (e) => {
+    touchStartY = e.touches[0].clientY;
+    const sec = track.children[currentIndex];
+    touchStartScrollTop = sec.hasAttribute("data-scrollable") ? sec.scrollTop : 0;
+  }, { passive: true });
+
+  container.addEventListener("touchend", (e) => {
+    const deltaY = touchStartY - e.changedTouches[0].clientY;
+    if (Math.abs(deltaY) < 40) return;
+
+    const currentSection = track.children[currentIndex];
+    const isScrollable = currentSection.hasAttribute("data-scrollable");
+    const hasOverflow = isScrollable && currentSection.scrollHeight > currentSection.clientHeight + 2;
+
+    if (hasOverflow) {
+      const scrollingDown = deltaY > 0;
+      const atBottom = currentSection.scrollTop + currentSection.clientHeight >= currentSection.scrollHeight - 2;
+      const atTop = currentSection.scrollTop <= 0;
+
+      if ((scrollingDown && !atBottom) || (!scrollingDown && !atTop)) return;
+    }
+
+    if (deltaY > 0) goToSection(currentIndex + 1);
+    else goToSection(currentIndex - 1);
+  }, { passive: true });
+
+  updateUI(0);
+}
+</script>
