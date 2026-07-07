@@ -1,0 +1,15 @@
+@import "tailwindcss";
+
+@theme {
+  --color-background: oklch(0.13 0.01 260);
+  --color-surface: oklch(0.18 0.01 260);
+  --color-surface-hover: oklch(0.22 0.01 260);
+  --color-ink: oklch(0.95 0.005 260);
+  --color-ink-muted: oklch(0.65 0.01 260);
+  --color-accent: oklch(0.6 0.18 280);
+  --color-accent-glow: oklch(0.6 0.18 280 / 0.15);
+  --color-border: oklch(0.25 0.01 260);
+  --color-green-accent: oklch(0.6 0.15 160);
+  --font-mono: "JetBrains Mono", "Fira Code", monospace;
+  --font-sans: "Inter", system-ui, sans-serif;
+}

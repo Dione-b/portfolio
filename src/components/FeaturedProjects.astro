@@ -1,0 +1,187 @@
+---
+interface Project {
+  name: string;
+  tagline: string;
+  highlights: string[];
+  stack: string[];
+  sections: { heading: string; content: string }[];
+  links: { label: string; url: string }[];
+}
+
+const projects: Project[] = [
+  {
+    name: "Caatinga",
+    tagline: "Deployment orchestration + versioned artifacts toolkit for Soroban smart contracts. 4 packages publicados no npm.",
+    highlights: [
+      "Monorepo TypeScript com 4 packages: cli, core, client, zk",
+      "CLI com 25+ comandos (init, build, deploy, invoke, doctor, zk)",
+      "Graph-aware deploy com dependências entre contratos",
+      "Geração automática de bindings TypeScript",
+      "Client SDK com adapters Freighter + Stellar Wallets Kit",
+      "Pipeline ZK com Circom + Groth16 para verificação on-chain",
+      "6 Architecture Decision Records documentados",
+      "Documentação para humanos e coding agents (llms.txt)"
+    ],
+    stack: ["TypeScript", "Stellar", "Soroban", "CLI"],
+    sections: [
+      { heading: "Visão Geral", content: "Caatinga é um ecossistema open source para desenvolvimento na rede Stellar, focando em deploy, versionamento de artifacts e geração de bindings TypeScript para contratos Soroban — sem necessidade de um registry centralizado." },
+      { heading: "Arquitetura", content: "Monorepo pnpm com 4 pacotes: @caatinga/cli (Commander, 25+ comandos), @caatinga/core (orquestração com Zod + execa), @caatinga/client (SDK browser com wallet adapters + React hooks), @caatinga/zk (serialização Groth16 para Circom). Core nunca importa CLI, Client só importa subpath browser do Core." },
+      { heading: "Diferencial", content: "Artifacts versionados em Git como fonte da verdade (sem registry). Deploy com ordenação topológica de dependências entre contratos. Pipeline CI/CD integrado. Código de erro estável CAATINGA_* como API pública para automação." },
+    ],
+    links: [
+      { label: "GitHub", url: "https://github.com/Dione-b/caatinga" },
+      { label: "Docs", url: "https://dione-b.github.io/caatinga/" },
+      { label: "npm (@caatinga/cli)", url: "https://www.npmjs.com/package/@caatinga/cli" },
+    ],
+  },
+  {
+    name: "Prumo",
+    tagline: "CLI que converte documentações e repositórios GitHub em arquivos llms.md, criando contexto estruturado para agentes de IA.",
+    highlights: [
+      "Crawler para HTML estático e JS-rendered",
+      "Integração com GitHub API",
+      "Exportação otimizada para LLMs",
+      "Redução de alucinações em agentes de IA",
+    ],
+    stack: ["Python", "CLI", "Playwright", "IA"],
+    sections: [
+      { heading: "Problema", content: "Agentes de IA sofrem com contexto desatualizado ou mal estruturado. Documentações técnicas espalhadas em múltiplas fontes dificultam a precisão das respostas." },
+      { heading: "Solução", content: "CLI que crawleia qualquer documentação (estática ou dinâmica) e gera um arquivo llms.md otimizado para LLMs, reduzindo alucinações e melhorando a qualidade do código gerado." },
+      { heading: "Arquitetura", content: "Core em Python com Playwright para rendering JS. Dois modos de crawl: superficial (HTML estático, rápido) e profundo (com JS, captura SPAs). Pipeline de pós-processamento que limpa, estrutura e otimiza o output para o formato llms.md." },
+    ],
+    links: [
+      { label: "GitHub", url: "https://github.com/Dione-b/prumo" },
+    ],
+  },
+  {
+    name: "Horus",
+    tagline: "Plataforma forense de correlação de identidades OSINT. 12+ tipos de IOC, pipeline modular com 6 módulos de busca, correlação por regras e grafo relacional.",
+    highlights: [
+      "12+ indicadores: username, email, phone, domain, wallet, metadata",
+      "6 módulos de busca (username, email, phone, domain, wallet, metadata)",
+      "12 regras de correlação com scoring de confiança",
+      "Grafo relacional interativo com vis-network",
+      "Cadeia de custódia com hash SHA-256 por evidência",
+      "Dashboard web React 19 embutido no binário Go",
+      "AI analysis (LLM ou heurística)",
+      "11 comandos CLI (search, resolve, correlate, report, analyze, dashboard, graph...)"
+    ],
+    stack: ["Go", "OSINT", "Modular", "React"],
+    sections: [
+      { heading: "Visão Geral", content: "Plataforma forense de correlação de identidades OSINT. Busca e correlaciona múltiplos indicadores (username, email, phone, domain, wallet, documentos) para construir perfis unificados com cadeia de custódia verificável." },
+      { heading: "Arquitetura", content: "Pipeline de 8 estágios em Go: Search (módulos concorrentes com goroutines + semáforo) → Enrichment (GitHub, Keybase, PGP, Maigret) → Correlation (12 regras com scoring) → Timeline → Graph → AI → Screenshots → Evidence (hash + dedup + validação). Graph traversal com BFS para resolução username-to-contact." },
+      { heading: "Diferencial", content: "12 regras de correlação (Username-Email, Avatar-Username, Document-Author, etc.) com confiança calculada. Evidências com hash SHA-256 para integridade forense. Dashboard React embutido via //go:embed. CLI Cobra com 11 comandos. SQLite para persistência de casos." },
+    ],
+    links: [
+      { label: "GitHub", url: "#" },
+    ],
+  },
+  {
+    name: "Notus API Intelligence",
+    tagline: "Plataforma para testes, análise e debugging de APIs com geração automática de insights utilizando LLMs.",
+    highlights: [
+      "23 endpoints em múltiplas categorias",
+      "Métricas P50, P95 e P99",
+      "Health Score e análise de erros",
+      "Integração com Google Gemini",
+      "Sanitização automática de dados sensíveis",
+    ],
+    stack: ["TypeScript", "Express", "React", "IA"],
+    sections: [
+      { heading: "Problema", content: "Desenvolvedores gastam horas debugando APIs manualmente — testando endpoints, analisando respostas, identificando padrões de falha. Processo repetitivo e propenso a erro humano." },
+      { heading: "Solução", content: "Plataforma que automatiza testes de API, coleta métricas de performance (P50, P95, P99), calcula Health Score, e gera insights com LLMs para diagnosticar problemas." },
+      { heading: "Arquitetura", content: "Backend Express com 23 endpoints categorizados. Sistema de testes automáticos com coleta de métricas. Integração com Google Gemini para análise semântica de erros. Pipeline de sanitização automática para remoção de dados sensíveis antes do envio ao LLM." },
+    ],
+    links: [
+      { label: "GitHub", url: "#" },
+    ],
+  },
+  {
+    name: "Acesso Cidadão",
+    tagline: "Plataforma que conecta cidadãos a programas sociais utilizando lógica de elegibilidade executada no frontend, sem coleta de dados pessoais.",
+    highlights: [
+      "Matching client-side",
+      "Foco em privacidade",
+      "Organização de dados públicos",
+      "Arquitetura Next.js + Strapi",
+    ],
+    stack: ["Next.js", "Open Source", "Privacidade", "Dados Públicos"],
+    sections: [
+      { heading: "Problema", content: "Cidadãos de baixa renda desconhecem programas sociais aos quais têm direito. Plataformas governamentais são fragmentadas e de difícil navegação." },
+      { heading: "Solução", content: "Plataforma que centraliza programas sociais e permite matching de elegibilidade sem armazenar dados pessoais — toda lógica roda no frontend do usuário." },
+      { heading: "Arquitetura", content: "Next.js no frontend com lógica de matching client-side. Strapi como CMS para dados públicos. Zero coleta de dados pessoais — privacidade como princípio arquitetural, não feature." },
+    ],
+    links: [
+      { label: "GitHub", url: "https://github.com/Dione-b/acesso-cidadao" },
+    ],
+  },
+];
+---
+
+<section id="projects" class="py-20 px-6 border-t border-border">
+  <div class="max-w-5xl mx-auto">
+    <h2 class="text-3xl font-bold mb-2 font-mono">Featured Projects</h2>
+    <p class="text-ink-muted mb-12 max-w-lg">Not just code — architecture, design decisions, and product thinking.</p>
+
+    <div class="space-y-20">
+      {
+        projects.map((project) => (
+          <article class="border border-border rounded-lg p-6 sm:p-8 bg-surface">
+            <div class="mb-6">
+              <h3 class="text-2xl font-bold">{project.name}</h3>
+              <p class="text-ink-muted mt-1">{project.tagline}</p>
+            </div>
+
+            {
+              project.name === "Caatinga" && (
+                <img src="/assets/caatinga_01.png" alt="Caatinga screenshot" class="w-full rounded-lg border border-border mb-6" />
+              )
+            }
+
+            <div class="flex flex-wrap gap-2 mb-6">
+              {project.stack.map((tech) => (
+                <span class="px-2 py-1 text-xs font-mono bg-background text-ink-muted rounded border border-border">
+                  {tech}
+                </span>
+              ))}
+            </div>
+
+            <details class="group mb-4">
+              <summary class="text-sm font-semibold text-accent font-mono cursor-pointer hover:text-ink transition-colors list-none flex items-center gap-2">
+                <span>Destaques</span>
+                <svg class="w-3 h-3 transition-transform group-open:rotate-90" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+                </svg>
+              </summary>
+              <ul class="mt-3 space-y-1.5">
+                {project.highlights.map((h) => (
+                  <li class="text-sm text-ink-muted flex items-start gap-2">
+                    <span class="text-accent mt-0.5">▹</span>
+                    {h}
+                  </li>
+                ))}
+              </ul>
+            </details>
+
+            <div class="space-y-4">
+              {project.sections.map((section) => (
+                <div>
+                  <h4 class="text-sm font-semibold text-accent font-mono mb-1">{section.heading}</h4>
+                  <p class="text-ink-muted text-sm leading-relaxed">{section.content}</p>
+                </div>
+              ))}
+            </div>
+
+            <div class="flex gap-4 mt-6 pt-4 border-t border-border">
+              {project.links.map((link) => (
+                <a href={link.url} target="_blank" rel="noopener" class="text-sm text-accent hover:text-ink transition-colors font-mono">
+                  {link.label} →
+                </a>
+              ))}
+            </div>
+          </article>
+        ))
+      }
+    </div>
+  </div>
+</section>
