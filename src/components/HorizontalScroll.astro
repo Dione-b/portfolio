@@ -36,9 +36,15 @@ const progressBar = document.getElementById("progress-bar");
 const prevBtn = document.getElementById("prev-btn");
 const nextBtn = document.getElementById("next-btn");
 
+const EDGE_COOLDOWN_MS = 450;
+const SWIPE_THRESHOLD_PX = 40;
+const WHEEL_THROTTLE_MS = 800;
+const ANIMATION_DURATION_MS = 750;
+
 let currentIndex = 0;
 let isAnimating = false;
 let lastWheelTime = 0;
+let lastEdgeReachedAt = 0;
 
 const prefersReduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 
@@ -61,7 +67,7 @@ if (prefersReduced) {
     track.style.transform = `translateX(-${currentIndex * 100}vw)`;
     updateUI(currentIndex);
     isAnimating = true;
-    setTimeout(() => { isAnimating = false; }, 750);
+    setTimeout(() => { isAnimating = false; }, ANIMATION_DURATION_MS);
   }
 
   function updateUI(index) {
@@ -125,37 +131,58 @@ if (prefersReduced) {
     const currentSection = track.children[currentIndex];
     const isScrollable = currentSection.hasAttribute("data-scrollable");
     const hasOverflow = isScrollable && currentSection.scrollHeight > currentSection.clientHeight + 2;
+    const scrollingDown = e.deltaY > 0;
+    const scrollingUp = e.deltaY < 0;
 
     if (hasOverflow) {
       const atTop = currentSection.scrollTop <= 0;
       const atBottom = currentSection.scrollTop + currentSection.clientHeight >= currentSection.scrollHeight - 2;
-      const scrollingDown = e.deltaY > 0;
-      const scrollingUp = e.deltaY < 0;
 
-      if ((scrollingDown && !atBottom) || (scrollingUp && !atTop)) {
-        currentSection.scrollTop += e.deltaY;
+      const canScrollDown = scrollingDown && !atBottom;
+      const canScrollUp = scrollingUp && !atTop;
+
+      if (canScrollDown || canScrollUp) {
+        lastEdgeReachedAt = 0;
+        return;
+      }
+
+      if (lastEdgeReachedAt === 0) {
+        lastEdgeReachedAt = now;
+        e.preventDefault();
+        return;
+      }
+
+      if (now - lastEdgeReachedAt < EDGE_COOLDOWN_MS) {
+        e.preventDefault();
         return;
       }
     }
 
     e.preventDefault();
-    if (now - lastWheelTime < 800) return;
+    if (now - lastWheelTime < WHEEL_THROTTLE_MS) return;
     lastWheelTime = now;
-    if (e.deltaY > 0) goToSection(currentIndex + 1);
-    else goToSection(currentIndex - 1);
+    if (scrollingDown) goToSection(currentIndex + 1);
+    else if (scrollingUp) goToSection(currentIndex - 1);
   }, { passive: false });
 
   let touchStartY = 0;
-  let touchStartScrollTop = 0;
+  let startedAtTop = false;
+  let startedAtBottom = false;
   container.addEventListener("touchstart", (e) => {
     touchStartY = e.touches[0].clientY;
     const sec = track.children[currentIndex];
-    touchStartScrollTop = sec.hasAttribute("data-scrollable") ? sec.scrollTop : 0;
+    if (sec.hasAttribute("data-scrollable") && sec.scrollHeight > sec.clientHeight + 2) {
+      startedAtTop = sec.scrollTop <= 0;
+      startedAtBottom = sec.scrollTop + sec.clientHeight >= sec.scrollHeight - 2;
+    } else {
+      startedAtTop = false;
+      startedAtBottom = false;
+    }
   }, { passive: true });
 
   container.addEventListener("touchend", (e) => {
     const deltaY = touchStartY - e.changedTouches[0].clientY;
-    if (Math.abs(deltaY) < 40) return;
+    if (Math.abs(deltaY) < SWIPE_THRESHOLD_PX) return;
 
     const currentSection = track.children[currentIndex];
     const isScrollable = currentSection.hasAttribute("data-scrollable");
@@ -163,10 +190,9 @@ if (prefersReduced) {
 
     if (hasOverflow) {
       const scrollingDown = deltaY > 0;
-      const atBottom = currentSection.scrollTop + currentSection.clientHeight >= currentSection.scrollHeight - 2;
-      const atTop = currentSection.scrollTop <= 0;
-
-      if ((scrollingDown && !atBottom) || (!scrollingDown && !atTop)) return;
+      if ((scrollingDown && !startedAtBottom) || (!scrollingDown && !startedAtTop)) {
+        return;
+      }
     }
 
     if (deltaY > 0) goToSection(currentIndex + 1);

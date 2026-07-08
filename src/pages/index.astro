@@ -2,7 +2,6 @@
 import Layout from "../layouts/Layout.astro";
 import HorizontalScroll from "../components/HorizontalScroll.astro";
 import Hero from "../components/Hero.astro";
-import Stats from "../components/Stats.astro";
 import FeaturedProjects from "../components/FeaturedProjects.astro";
 import ProjectsTable from "../components/ProjectsTable.astro";
 import Articles from "../components/Articles.astro";
@@ -12,12 +11,9 @@ import Contact from "../components/Contact.astro";
 ---
 
 <Layout>
-  <HorizontalScroll labels={["Início", "Stats", "Projetos", "Tabela", "Artigos", "Skills", "Timeline", "Contato"]}>
+  <HorizontalScroll labels={["Início", "Projetos", "Tabela", "Artigos", "Skills", "Timeline", "Contato"]}>
     <div class="w-screen h-screen flex-shrink-0 flex items-center justify-center">
       <Hero />
-    </div>
-    <div class="w-screen h-screen flex-shrink-0 flex items-center justify-center">
-      <Stats />
     </div>
     <div class="w-screen h-screen flex-shrink-0 overflow-y-auto" data-scrollable>
       <FeaturedProjects />
