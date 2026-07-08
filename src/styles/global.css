@@ -14,28 +14,6 @@
   --font-sans: "Inter", system-ui, sans-serif;
 }
 
-:root {
-  --scroll-progress: 0;
-  --section-index: 0;
-}
-
-.parallax-bg {
-  transform: translateX(calc(var(--scroll-progress) * -20vw));
-  will-change: transform;
-}
-
-.parallax-fg {
-  transform: translateX(calc(var(--scroll-progress) * -140vw));
-  will-change: transform;
-}
-
-.scroll-dot span {
-  will-change: transform, background-color;
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .parallax-bg,
-  .parallax-fg {
-    transform: none;
-  }
+.hero-glow {
+  transform: none;
 }
