@@ -12,25 +12,25 @@ import Contact from "../components/Contact.astro";
 
 <Layout>
   <HorizontalScroll labels={["Início", "Projetos", "Tabela", "Artigos", "Skills", "Timeline", "Contato"]}>
-    <div class="w-screen h-screen flex-shrink-0 flex items-center justify-center">
+    <div class="w-screen h-screen flex-shrink-0 overflow-y-auto flex flex-col items-center justify-start md:justify-center py-12 md:py-0" data-scrollable>
       <Hero />
     </div>
     <div class="w-screen h-screen flex-shrink-0 overflow-y-auto" data-scrollable>
       <FeaturedProjects />
     </div>
-    <div class="w-screen h-screen flex-shrink-0 flex items-center justify-center">
+    <div class="w-screen h-screen flex-shrink-0 overflow-y-auto flex flex-col items-center justify-start md:justify-center py-12 md:py-0" data-scrollable>
       <ProjectsTable />
     </div>
-    <div class="w-screen h-screen flex-shrink-0 flex items-center justify-center">
+    <div class="w-screen h-screen flex-shrink-0 overflow-y-auto flex flex-col items-center justify-start md:justify-center py-12 md:py-0" data-scrollable>
       <Articles />
     </div>
-    <div class="w-screen h-screen flex-shrink-0 flex items-center justify-center">
+    <div class="w-screen h-screen flex-shrink-0 overflow-y-auto flex flex-col items-center justify-start md:justify-center py-12 md:py-0" data-scrollable>
       <Skills />
     </div>
     <div class="w-screen h-screen flex-shrink-0 overflow-y-auto" data-scrollable>
       <Timeline />
     </div>
-    <div class="w-screen h-screen flex-shrink-0 flex items-center justify-center">
+    <div class="w-screen h-screen flex-shrink-0 overflow-y-auto flex flex-col items-center justify-start md:justify-center py-12 md:py-0" data-scrollable>
       <Contact />
     </div>
   </HorizontalScroll>
